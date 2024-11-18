@@ -1,0 +1,39 @@
+graph TD
+    subgraph "Document Processing"
+        A[Raw Document] --> B[Text Content]
+        B --> C{Split into Chunks}
+        C --> D[Chunk 1]
+        C --> E[Chunk 2]
+        C --> F[Chunk N]
+    end
+
+    subgraph "Embedding Generation"
+        D --> G[Embedding 1]
+        E --> H[Embedding 2]
+        F --> I[Embedding N]
+    end
+
+    subgraph "Vector Storage"
+        G --> J[(ChromaDB)]
+        H --> J
+        I --> J
+    end
+
+    subgraph "Query Processing"
+        K[User Query] --> L[Query Embedding]
+        L --> M{Vector Search}
+        J --> M
+        M --> N[Relevant Chunks]
+        N --> O[Augmented Prompt]
+        O --> P[LLM Response]
+    end
+
+    classDef processing fill:#e1f5fe,stroke:#01579b
+    classDef embedding fill:#e8f5e9,stroke:#2e7d32
+    classDef storage fill:#fff3e0,stroke:#e65100
+    classDef query fill:#fce4ec,stroke:#880e4f
+
+    class A,B,C,D,E,F processing
+    class G,H,I embedding
+    class J storage
+    class K,L,M,N,O,P query

@@ -1,0 +1,37 @@
+sequenceDiagram
+    participant U as User
+    participant F as Frontend
+    participant S as Flask Server
+    participant V as Vector Store
+    participant C as ChromaDB
+    participant L as LM Studio
+
+    U->>F: 1. Send message
+    Note over F: Check for @mentions
+
+    alt Message contains @file reference
+        F->>S: 2a. POST /chat with file reference
+        S->>V: 3a. Query similar content
+        V->>C: 4a. Search vectors
+        C-->>V: 5a. Return matches
+        V-->>S: 6a. Return relevant chunks
+        S->>L: 7a. Send augmented prompt
+    else Normal message
+        F->>S: 2b. POST /chat
+        S->>L: 3b. Send direct prompt
+    end
+
+    L-->>S: 8. Return completion
+    S-->>F: 9. Send response
+    F-->>U: 10. Display response
+
+    Note over F,S: Parallel status updates
+    loop Every 1s during init
+        F->>S: Check initialization status
+        S-->>F: Return current status
+    end
+    
+    loop Every 5s
+        F->>S: Update file list
+        S-->>F: Return file list
+    end

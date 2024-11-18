@@ -1,0 +1,30 @@
+flowchart TB
+    subgraph "1. Upload Process"
+        U[Upload File] --> |1. Save to disk| F[File System]
+        F --> |2. Read content| P[Process Text]
+        P --> |3. Split| C[Text Chunks]
+        C --> |4. Generate| V[Vectors]
+        V --> |5. Store| DB[(ChromaDB)]
+        
+        %% Metadata Flow
+        C --> |Store with| M[Metadata]
+        M --> |Attach to| DB
+    end
+
+    subgraph "2. Query Process"
+        Q[User Query] --> |1. Extract| R["@file reference"]
+        R --> |2. Generate| QV[Query Vector]
+        QV --> |3. Search| DB
+        DB --> |4. Return| RC[Relevant Chunks]
+        RC --> |5. Format| AP[Augmented Prompt]
+        AP --> |6. Send to| LM[LM Studio]
+    end
+
+    %% Additional Info
+    classDef process fill:#e1f5fe,stroke:#01579b
+    classDef storage fill:#fff3e0,stroke:#e65100
+    classDef query fill:#fce4ec,stroke:#880e4f
+
+    class U,P,C,V process
+    class F,DB storage
+    class Q,R,QV,RC,AP,LM query

@@ -1,0 +1,60 @@
+graph TB
+    subgraph "Frontend Layer"
+        UI[Web Interface]
+        Status[Status Monitoring]
+        FileList[File List]
+        Chat[Chat Interface]
+    end
+
+    subgraph "Backend Layer"
+        Flask[Flask Server]
+        VectorStore[Vector Store]
+        EmbedModel[Embedding Model]
+        FileSystem[File System]
+        ChromaDB[(ChromaDB)]
+    end
+
+    subgraph "External Services"
+        LMStudio[LM Studio API]
+    end
+
+    %% Frontend to Backend Connections
+    UI --> |1. Upload file| Flask
+    UI --> |2. Send message| Flask
+    Status --> |3. Check status| Flask
+    FileList --> |4. Get files| Flask
+
+    %% Backend Internal Flow
+    Flask --> |5a. Store file| FileSystem
+    Flask --> |5b. Process text| VectorStore
+    VectorStore --> |6. Generate embeddings| EmbedModel
+    VectorStore --> |7. Store vectors| ChromaDB
+    FileSystem --> |8. Read content| Flask
+    ChromaDB --> |9. Query similar| VectorStore
+
+    %% External Communication
+    Flask --> |10. Get completion| LMStudio
+    LMStudio --> |11. Return response| Flask
+
+    %% Status Updates
+    Flask --> |12a. Update status| Status
+    Flask --> |12b. Update file list| FileList
+    Flask --> |12c. Send response| Chat
+
+    %% Initialization Flow
+    EmbedModel --> |Init| VectorStore
+    VectorStore --> |Status| Flask
+
+    %% File Processing Flow
+    FileSystem --> |Content| VectorStore
+    VectorStore --> |Chunks| ChromaDB
+
+    classDef frontend fill:#e1f5fe,stroke:#01579b
+    classDef backend fill:#e8f5e9,stroke:#2e7d32
+    classDef external fill:#fce4ec,stroke:#880e4f
+    classDef storage fill:#fff3e0,stroke:#e65100
+
+    class UI,Status,FileList,Chat frontend
+    class Flask,VectorStore,EmbedModel,FileSystem backend
+    class LMStudio external
+    class ChromaDB storage
